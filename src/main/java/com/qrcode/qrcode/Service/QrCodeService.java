@@ -19,10 +19,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.Base64;
 
 @Controller
 public class QrCodeService {
@@ -49,11 +51,14 @@ public class QrCodeService {
   private String writeQR(Disciplina request) throws WriterException, IOException {
     String qcodePath = "src/main/resources/static/images/" + request.getCdDisciplina() + "-QRCode.png";
     QRCodeWriter qrCodeWriter = new QRCodeWriter();
+    ByteArrayOutputStream stream = new ByteArrayOutputStream();
     BitMatrix bitMatrix = qrCodeWriter.encode(request.getCdDisciplina() + "\n" + request.getQtCredito() + "\n"
-        + request.getQtCredito() + "\n" + request.getCdProfessor(), BarcodeFormat.QR_CODE, 350, 350);
+        + request.getTurma() + "\n" + request.getCdProfessor(), BarcodeFormat.QR_CODE, 350, 350);
     Path path = FileSystems.getDefault().getPath(qcodePath);
-    MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
-    return "/images/" + request.getCdDisciplina() + "-QRCode.png";
+    MatrixToImageWriter.writeToStream(bitMatrix, "PNG", stream);
+    stream.flush();
+    byte[] baseEncoded = Base64.getEncoder().encode(stream.toByteArray());
+    return new String(baseEncoded);
   }
 
   private String readQR(String qrImage) throws Exception {
@@ -66,6 +71,5 @@ public class QrCodeService {
     System.out.println("Barcode Format: " + result.getBarcodeFormat());
     System.out.println("Content: " + result.getText());
     return result.getText();
-
   }
 }
