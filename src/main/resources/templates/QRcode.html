@@ -30,7 +30,7 @@
 				cache: false,
 				timeout: 600000,
 				success: function (data) {
-					$("#qrCode").attr("src", data);
+					$("#qrCode").attr("src", "data:image/jpeg;base64, "+ data);
 					console.log("SUCCESS : ", data);
 				},
 				error: function (e) {
@@ -48,7 +48,7 @@
 <body>
 	<div class="container" align="center">
 		<div class="card" style="width: 400px" align="center">
-			<img class="card-img-top" th:src="|data:image/png;base64,${code}|" alt="QR Code"
+			<img class="card-img-top" id="qrCode" th:src="|data:image/png;base64,${code}|" alt="QR Code"
 				style="width: 100%" />
 			<div class="card-body" align="center">
 				<a th:href="@{'/readQR?qrImage=' + ${code}}" class="btnbtn-primary">Read
