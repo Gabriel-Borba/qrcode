@@ -48,7 +48,7 @@ public class QrCodeService {
 
   }
 
-  private String writeQR(Disciplina request) throws WriterException, IOException {
+  public String writeQR(Disciplina request) throws WriterException, IOException {
     String qcodePath = "src/main/resources/static/images/" + request.getCdDisciplina() + "-QRCode.png";
     QRCodeWriter qrCodeWriter = new QRCodeWriter();
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
