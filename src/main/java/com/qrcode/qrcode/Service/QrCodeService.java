@@ -22,8 +22,11 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 @Controller
@@ -34,7 +37,7 @@ public class QrCodeService {
 
   @PostMapping("/create")
   public String createNewAccount(@ModelAttribute("request") Disciplina request, Model model)
-      throws WriterException, IOException {
+      throws WriterException, IOException, NoSuchAlgorithmException {
     String qrCodePath = writeQR(request);
     model.addAttribute("code", qrCodePath);
     return "QRcode";
@@ -48,13 +51,11 @@ public class QrCodeService {
 
   }
 
-  public String writeQR(Disciplina request) throws WriterException, IOException {
-    String qcodePath = "src/main/resources/static/images/" + request.getCdDisciplina() + "-QRCode.png";
+  public String writeQR(Disciplina request) throws WriterException, IOException, NoSuchAlgorithmException {
     QRCodeWriter qrCodeWriter = new QRCodeWriter();
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    BitMatrix bitMatrix = qrCodeWriter.encode(request.getCdDisciplina() + "\n" + request.getQtCredito() + "\n"
+    BitMatrix bitMatrix = qrCodeWriter.encode(createHash(request.toString()) + request.getCdDisciplina() + "\n" + request.getQtCredito() + "\n"
         + request.getTurma() + "\n" + request.getCdProfessor(), BarcodeFormat.QR_CODE, 350, 350);
-    Path path = FileSystems.getDefault().getPath(qcodePath);
     MatrixToImageWriter.writeToStream(bitMatrix, "PNG", stream);
     stream.flush();
     byte[] baseEncoded = Base64.getEncoder().encode(stream.toByteArray());
@@ -71,5 +72,13 @@ public class QrCodeService {
     System.out.println("Barcode Format: " + result.getBarcodeFormat());
     System.out.println("Content: " + result.getText());
     return result.getText();
+  }
+
+  public String createHash(String code) throws NoSuchAlgorithmException {
+    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    byte[] encodedhash = digest.digest(
+        code.getBytes(StandardCharsets.UTF_8));
+    return new String(encodedhash);
+
   }
 }

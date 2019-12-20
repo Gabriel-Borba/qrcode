@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 @RestController
@@ -19,7 +20,7 @@ public class QrCodeController {
 
   @PostMapping("/createNewQrCode")
   public String createNewQrCode(@ModelAttribute("request") Disciplina request)
-      throws WriterException, IOException {
+      throws WriterException, IOException, NoSuchAlgorithmException {
     Random r = new Random();
 
     request.setCdDisciplina(String.valueOf(r.nextInt(80000)));
