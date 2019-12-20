@@ -7,6 +7,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.qrcode.qrcode.model.Disciplina;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -74,11 +75,7 @@ public class QrCodeService {
     return result.getText();
   }
 
-  public String createHash(String code) throws NoSuchAlgorithmException {
-    MessageDigest digest = MessageDigest.getInstance("SHA-256");
-    byte[] encodedhash = digest.digest(
-        code.getBytes(StandardCharsets.UTF_8));
-    return new String(encodedhash);
-
+  public String createHash(String code) {
+    return DigestUtils.sha256Hex(code);
   }
 }
